@@ -1,12 +1,15 @@
 import { useState, useEffect } from "react";
+import Error from "./Error";
 
-const Form = ({ pacients, setPacients }) => {
+const Form = ({ pacient, pacients, setPacients }) => {
   const [namePet, setNamePet] = useState("");
   const [properyPet, setPropertyPet] = useState("");
   const [email, setEmail] = useState("");
   const [date, setDate] = useState("");
   const [symptoms, setSymptoms] = useState("");
   const [error, setError] = useState(false);
+  const generateId =
+    Date.now().toString + Math.random().toString(36).substring(2);
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -20,7 +23,8 @@ const Form = ({ pacients, setPacients }) => {
       properyPet,
       email,
       date,
-      symptoms
+      symptoms,
+      id: generateId
     }
 
     setPacients([...pacients, pacient]);
@@ -36,7 +40,7 @@ const Form = ({ pacients, setPacients }) => {
         Seguimientos Pacientes
       </h2>
       <p className="text-lg mt-5 text-center mb-10">
-        Añade Pacientes y {""}{" "}
+        Añade Pacientes y {""}
         <span className="text-indigo-600 font-bold ">Administralos</span>
       </p>
       <form
@@ -44,9 +48,7 @@ const Form = ({ pacients, setPacients }) => {
         className="bg-white shadow-md rounded-lg py-10 px-5 mb-10 "
       >
         {error && (
-          <div className="bg-red-600 text-white text-center uppercase font-bold mb-3 rounded-md p-3">
-            <p>Todos los campos son obligatorios</p>
-          </div>
+          <Error>Todos los campos son obligatorios</Error>
         )}
         <div className="mb-5">
           <label
