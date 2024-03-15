@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Error from "./Error";
 
-const Form = ({ pacient, pacients, setPacients }) => {
+const Form = ({ pacient, pacients, setPacients, setPacient }) => {
   const [namePet, setNamePet] = useState("");
   const [properyPet, setPropertyPet] = useState("");
   const [email, setEmail] = useState("");
@@ -10,6 +10,17 @@ const Form = ({ pacient, pacients, setPacients }) => {
   const [error, setError] = useState(false);
   const generateId =
     Date.now().toString + Math.random().toString(36).substring(2);
+  // Las dependencias es decir que se ejecute cuando una variable cambie
+  useEffect(() => {
+    if (Object.keys(pacient).length > 0) {
+      setNamePet(pacient.namePet);
+      setEmail(pacient.email);
+      setPropertyPet(pacient.properyPet);
+      setDate(pacient.date);
+      setSymptoms(pacient.symptoms);
+    }
+  }, [pacient]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -18,16 +29,26 @@ const Form = ({ pacient, pacients, setPacients }) => {
       return;
     }
     setError(false);
-    const pacient = {
+    const newPacient = {
       namePet,
       properyPet,
       email,
       date,
       symptoms,
-      id: generateId
+    };
+    if (pacient.id) {
+      newPacient.id = pacient.id;
+      const newListPacients = pacients.map((pacientState) => {
+        return pacientState.id === pacient.id ? newPacient : pacientState;
+      });
+      setPacients(newListPacients);
+      //Eliminar el paciente en memoria que se está editando
+      setPacient({});
+    } else {
+      newPacient.id = generateId;
+      setPacients([...pacients, newPacient]);
     }
 
-    setPacients([...pacients, pacient]);
     setNamePet("");
     setPropertyPet("");
     setDate("");
@@ -47,9 +68,7 @@ const Form = ({ pacient, pacients, setPacients }) => {
         onSubmit={handleSubmit}
         className="bg-white shadow-md rounded-lg py-10 px-5 mb-10 "
       >
-        {error && (
-          <Error>Todos los campos son obligatorios</Error>
-        )}
+        {error && <Error>Todos los campos son obligatorios</Error>}
         <div className="mb-5">
           <label
             className="block text-gray-700 uppercase font-bold"
@@ -147,7 +166,7 @@ const Form = ({ pacient, pacients, setPacients }) => {
         <input
           className="bg-indigo-600 w-full p-3 text-white uppercase font-bold hover:bg-indigo-700 cursor-pointer"
           type="submit"
-          value="Agregar Paciente"
+          value={pacient.id ? "Editar Paciente" : "Agregar Paciente"}
         />
       </form>
     </div>
